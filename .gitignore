@@ -1,0 +1,4 @@
+/app/ddns/ipconfig.py
+.idea
+venv
+*.sqlite
