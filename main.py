@@ -69,7 +69,7 @@ async def on_startup():
     await create_db_and_tables()
     Schedule.start()
     Schedule.add_job(check_online, 'interval', seconds=30)
-    Schedule.add_job(get_ip, 'interval', minutes=60, next_run_time=datetime.fromtimestamp(time.time()))
+    #Schedule.add_job(get_ip, 'interval', minutes=60, next_run_time=datetime.fromtimestamp(time.time()))
 
 
 def check_online():
@@ -84,4 +84,4 @@ def check_online():
 
 
 if __name__ == '__main__':
-    uvicorn.run(app='main:app', host="0.0.0.0", port=7000, reload=True, debug=True)
+    uvicorn.run(app='main:app', host="0.0.0.0", port=7001)
