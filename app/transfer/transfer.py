@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Form
 from sqlalchemy import select, and_
 
-from app.databases import User, TransferMessage, async_session_maker
+from app.databases import User, TransferMessage, async_session_maker, ShareRules
 from app.users import current_active_user
 import time
 
@@ -29,23 +29,46 @@ async def add_entry(number: str, received: datetime, body: str, _id: int, owner:
 
 
 @transfer_router.post("/webhook")
-async def add_entry_tasker(token: str, payload: str = Form()):
+async def add_entry_webhook(token: str, payload: str = Form()):
     result = payload.split('\n')
-    stime = datetime.strptime(result[3], '%Y-%m-%d %H:%M:%S')
-    return await add_entry(result[0], stime, result[1], int(time.time()), token)
+    received = datetime.strptime(result[3], '%Y-%m-%d %H:%M:%S')
+    return await add_entry(result[0], received, result[1], int(time.time()), token)
 
 
 @transfer_router.get("/entries")
 async def get_entry(user: User = Depends(current_active_user)):
     async with async_session_maker() as session:
-        statement = select(TransferMessage)\
-            .where(TransferMessage.owner == user.id)\
-            .order_by(TransferMessage.received.desc())\
+        statement = select(TransferMessage) \
+            .where(TransferMessage.owner == user.id) \
+            .order_by(TransferMessage.received.desc()) \
             .limit(10)
         entries = await session.scalars(statement)
         items = []
         for item in entries:
             items.append(item)
+    return {
+        'status': 'success',
+        'user': user,
+        'entries': items
+    }
+
+
+async def get_entry_specific(keyword: str, session):
+    statement = select(TransferMessage) \
+        .where(TransferMessage.body.like(keyword)) \
+        .order_by(TransferMessage.received.desc()) \
+        .limit(10)
+    return await session.scalars(statement)
+
+
+@transfer_router.get("/entries/share")
+async def get_shared_messages(user: User = Depends(current_active_user)):
+    async with async_session_maker() as session:
+        statement = select(ShareRules).where(and_(ShareRules.user_id == user.id, ShareRules.share_type == 0))
+        items = []
+        if await session.scalar(statement) is not None:
+            for item in await get_entry_specific("百度账号", session):
+                items.append(item)
     return {
         'status': 'success',
         'user': user,

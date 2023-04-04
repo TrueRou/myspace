@@ -3,7 +3,7 @@ from typing import AsyncGenerator
 from fastapi import Depends
 from fastapi_users.db import SQLAlchemyBaseUserTableUUID, SQLAlchemyUserDatabase
 from fastapi_users_db_sqlalchemy import GUID
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -14,6 +14,11 @@ Base = declarative_base()
 
 class User(SQLAlchemyBaseUserTableUUID, Base):
     username = Column(String(64))
+    manage_available = Column(Boolean, default=False)
+    live_available = Column(Boolean, default=False)
+    message_available = Column(Boolean, default=False)
+    chat_available = Column(Boolean, default=False)
+    message_baidu_available = Column(Boolean, default=False)
     pass
 
 
@@ -63,3 +68,4 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 
 async def get_user_db(session: AsyncSession = Depends(get_async_session)):
     yield SQLAlchemyUserDatabase(session, User)
+

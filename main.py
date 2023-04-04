@@ -1,5 +1,4 @@
 import datetime
-import time
 import warnings
 
 import uvicorn
@@ -10,7 +9,6 @@ from datetime import datetime, timedelta
 from starlette.middleware.cors import CORSMiddleware
 
 from app.databases import create_db_and_tables
-from app.ddns.getip import get_ip
 from app.live.live import live_router
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.transfer.transfer import transfer_router
@@ -69,7 +67,6 @@ async def on_startup():
     await create_db_and_tables()
     Schedule.start()
     Schedule.add_job(check_online, 'interval', seconds=30)
-    #Schedule.add_job(get_ip, 'interval', minutes=60, next_run_time=datetime.fromtimestamp(time.time()))
 
 
 def check_online():
@@ -84,4 +81,4 @@ def check_online():
 
 
 if __name__ == '__main__':
-    uvicorn.run(app='main:app', host="0.0.0.0", port=7001)
+    uvicorn.run(app='main:app', host="127.0.0.1", port=7001)
