@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Form
 from sqlalchemy import select, and_
 
-from app.databases import User, TransferMessage, async_session_maker, ShareRules
+from app.databases import User, TransferMessage, async_session_maker
 from app.users import current_active_user
 import time
 
