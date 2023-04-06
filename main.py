@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 
 from starlette.middleware.cors import CORSMiddleware
 
+from app.chatgpt.chatgpt import chatgpt_router
 from app.databases import create_db_and_tables
 from app.live.live import live_router
 from app.schemas import UserCreate, UserRead, UserUpdate
@@ -48,6 +49,7 @@ app.include_router(
 )
 app.include_router(live_router)
 app.include_router(transfer_router)
+app.include_router(chatgpt_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
