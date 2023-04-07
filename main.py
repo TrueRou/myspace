@@ -25,9 +25,7 @@ warnings.filterwarnings(
     message="The localize method is no longer necessary, as this time zone supports the fold attribute",
 )
 
-api_url = "/openapi.json" if secret.is_dev else "https://turou.nogu.dev/api/myspace/openapi.json"
-
-app = FastAPI(openapi_url="https://turou.nogu.dev/api/myspace/openapi.json")
+app = FastAPI()
 Schedule = AsyncIOScheduler()
 
 app.include_router(
