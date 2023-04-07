@@ -1,27 +1,33 @@
 import datetime
 import warnings
+from typing import List
 
 import uvicorn
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from datetime import datetime, timedelta
 
+from sqlalchemy import select
 from starlette.middleware.cors import CORSMiddleware
 
+import secret
+from app import schemas
 from app.chatgpt.chatgpt import chatgpt_router
-from app.databases import create_db_and_tables
+from app.databases import create_db_and_tables, User, async_session_maker
 from app.live.live import live_router
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.transfer.transfer import transfer_router
-from app.users import auth_backend, fastapi_users
+from app.users import auth_backend, fastapi_users, current_active_user
 from cache import online_users, not_logged_users
 
 warnings.filterwarnings(
-        "ignore",
-        message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-    )
+    "ignore",
+    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
+)
 
-app = FastAPI()
+api_url = "/openapi.json" if secret.is_dev else "https://turou.nogu.dev/api/myspace/openapi.json"
+
+app = FastAPI(openapi_url="/api/v1/openapi.json")
 Schedule = AsyncIOScheduler()
 
 app.include_router(
@@ -42,8 +48,22 @@ app.include_router(
     prefix="/auth",
     tags=["auth"],
 )
+users_router = fastapi_users.get_users_router(UserRead, UserUpdate)
+
+
+@app.get("/manage/users", response_model=List[schemas.UserRead])
+async def get_all_users(user: User = Depends(current_active_user)):
+    if user.is_superuser and user.manage_available:
+        async with async_session_maker() as session:
+            entries = await session.scalars(select(User))
+            items = []
+            for item in entries:
+                items.append(item)
+            return items
+
+
 app.include_router(
-    fastapi_users.get_users_router(UserRead, UserUpdate),
+    users_router,
     prefix="/users",
     tags=["users"],
 )

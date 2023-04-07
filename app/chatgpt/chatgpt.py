@@ -4,7 +4,7 @@ import secret
 from app.databases import User
 from app.users import current_active_user
 
-chatgpt_router = APIRouter(prefix='/chatgpt')
+chatgpt_router = APIRouter(prefix='/chatgpt', tags=["chatgpt"])
 
 
 @chatgpt_router.get("/token")

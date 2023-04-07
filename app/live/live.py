@@ -11,7 +11,7 @@ from app.users import current_active_user, current_active_user_optional
 from cache import append_message_cache, append_online_users, get_online_users, \
     get_messages, append_not_logged_users, not_logged_users
 
-live_router = APIRouter(prefix='/live')
+live_router = APIRouter(prefix='/live', tags=["live"])
 
 
 @live_router.get("/status")

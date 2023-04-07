@@ -8,7 +8,7 @@ from app.databases import User, TransferMessage, async_session_maker
 from app.users import current_active_user
 import time
 
-transfer_router = APIRouter(prefix='/transfer')
+transfer_router = APIRouter(prefix='/transfer', tags=['messages'])
 
 
 @transfer_router.post("/entries")
