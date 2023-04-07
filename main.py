@@ -27,7 +27,7 @@ warnings.filterwarnings(
 
 api_url = "/openapi.json" if secret.is_dev else "https://turou.nogu.dev/api/myspace/openapi.json"
 
-app = FastAPI(openapi_url="/api/v1/openapi.json")
+app = FastAPI(openapi_url="https://turou.nogu.dev/api/myspace/openapi.json")
 Schedule = AsyncIOScheduler()
 
 app.include_router(
