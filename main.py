@@ -58,7 +58,7 @@ async def get_all_users(user: User = Depends(current_active_user)):
             for item in entries:
                 items.append(item)
             return items
-
+    return []
 
 app.include_router(
     users_router,
