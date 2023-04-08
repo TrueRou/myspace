@@ -9,6 +9,7 @@ class UserRead(schemas.BaseUser[uuid.UUID]):
     live_available: bool
     message_available: bool
     chat_available: bool
+    message_baidu_available: bool
     pass
 
 
@@ -19,4 +20,9 @@ class UserCreate(schemas.BaseUserCreate):
 
 class UserUpdate(schemas.BaseUserUpdate):
     username: str
+    manage_available: bool
+    live_available: bool
+    message_available: bool
+    chat_available: bool
+    message_baidu_available: bool
     pass
