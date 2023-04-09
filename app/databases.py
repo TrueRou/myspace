@@ -30,6 +30,15 @@ class Live(Base):
     beginning_time = Column(DateTime())
     description = Column(String(128))
     owner = Column(String(64))
+    link = Column(String(128))
+
+
+class LiveLinks(Base):
+    __tablename__ = "live_links"
+
+    id = Column(Integer, primary_key=True)
+    label = Column(String(64))
+    link = Column(String(128))
 
 
 class Message(Base):

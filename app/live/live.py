@@ -6,7 +6,7 @@ from datetime import datetime
 
 from starlette.requests import Request
 
-from app.databases import Live, User, Message, async_session_maker
+from app.databases import Live, User, Message, async_session_maker, LiveLinks
 from app.users import current_active_user, current_active_user_optional
 from cache import append_message_cache, append_online_users, get_online_users, \
     get_messages, append_not_logged_users, not_logged_users
@@ -50,8 +50,55 @@ async def send_message(message: str, user: User = Depends(current_active_user)):
 
 
 @live_router.post("/create")
-async def create_live(title: str, description: str, owner: str):
+async def create_live(title: str, description: str, owner: str, link: str, user: User = Depends(current_active_user)):
+    if user.live_available:
+        async with async_session_maker() as session:
+            async with session.begin():
+                session.add(Live(title=title, beginning_time=datetime.now(), description=description, owner=owner, link=link))
+        return {'status': 'success'}
+    else:
+        return {'status': 'failure', 'message': 'No permission'}
+
+
+@live_router.get("/link")
+async def get_live_link():
     async with async_session_maker() as session:
-        async with session.begin():
-            session.add(Live(title=title, beginning_time=datetime.now(), description=description, owner=owner))
-    return {'status': 'success'}
+        live = await session.scalar(select(Live).order_by(Live.beginning_time.desc()))
+        if live is None:
+            return {
+                'status': 'error',
+                'msg': 'There is no live existed.'
+            }
+        return {
+            'status': 'success',
+            'link': live
+        }
+
+
+@live_router.get("/links")
+async def get_live_links(user: User = Depends(current_active_user)):
+    if user.live_available:
+        async with async_session_maker() as session:
+            entries = await session.scalars(select(LiveLinks))
+            items = []
+            for item in entries:
+                items.append(item)
+            return {
+                'status': 'success',
+                'links': items
+            }
+    else:
+        return {'status': 'failure', 'message': 'No permission'}
+
+
+@live_router.post("/links")
+async def create_live_links(label: str, link: str, user: User = Depends(current_active_user)):
+    if user.live_available:
+        async with async_session_maker() as session:
+            async with session.begin():
+                session.add(
+                    LiveLinks(link=link, label=label))
+        return {'status': 'success'}
+    else:
+        return {'status': 'failure', 'message': 'No permission'}
+
