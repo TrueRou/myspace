@@ -1,12 +1,13 @@
 import datetime
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Form
 from sqlalchemy import select
 from datetime import datetime
 
 from starlette.requests import Request
 
 from app.databases import Live, User, Message, async_session_maker, LiveLinks
+from app.schemas import LiveCreation
 from app.users import current_active_user, current_active_user_optional
 from cache import append_message_cache, append_online_users, get_online_users, \
     get_messages, append_not_logged_users, not_logged_users
@@ -50,11 +51,12 @@ async def send_message(message: str, user: User = Depends(current_active_user)):
 
 
 @live_router.post("/create")
-async def create_live(title: str, description: str, owner: str, link: str, user: User = Depends(current_active_user)):
+async def create_live(params: LiveCreation, user: User = Depends(current_active_user)):
     if user.live_available:
         async with async_session_maker() as session:
             async with session.begin():
-                session.add(Live(title=title, beginning_time=datetime.now(), description=description, owner=owner, link=link))
+                session.add(
+                    Live(title=params.title, beginning_time=datetime.now(), description=params.description, owner=user.username, link=params.link))
         return {'status': 'success'}
     else:
         return {'status': 'failure', 'message': 'No permission'}
@@ -71,7 +73,7 @@ async def get_live_link():
             }
         return {
             'status': 'success',
-            'link': live
+            'link': live.link
         }
 
 
@@ -101,4 +103,3 @@ async def create_live_links(label: str, link: str, user: User = Depends(current_
         return {'status': 'success'}
     else:
         return {'status': 'failure', 'message': 'No permission'}
-

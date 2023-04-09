@@ -1,6 +1,7 @@
 import uuid
 
 from fastapi_users import schemas
+from pydantic import BaseModel
 
 
 class UserRead(schemas.BaseUser[uuid.UUID]):
@@ -26,3 +27,9 @@ class UserUpdate(schemas.BaseUserUpdate):
     chat_available: bool
     message_baidu_available: bool
     pass
+
+
+class LiveCreation(BaseModel):
+    title: str
+    description: str
+    link: str
