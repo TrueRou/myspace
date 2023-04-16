@@ -111,7 +111,7 @@ async def remove_live_links(id: int, user: User = Depends(current_active_user)):
         async with async_session_maker() as session:
             async with session.begin():
                 link = (await session.scalar(select(LiveLinks).where(LiveLinks.id == id)))
-                session.delete(link)
+                await session.delete(link)
         return {'status': 'success'}
     else:
         return {'status': 'failure', 'message': 'No permission'}
