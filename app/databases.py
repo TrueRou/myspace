@@ -17,8 +17,6 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
     manage_available = Column(Boolean, default=False)
     live_available = Column(Boolean, default=False)
     message_available = Column(Boolean, default=False)
-    chat_available = Column(Boolean, default=False)
-    message_baidu_available = Column(Boolean, default=False)
     pass
 
 
