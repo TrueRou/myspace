@@ -10,9 +10,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import select
 from starlette.middleware.cors import CORSMiddleware
 
-import secret
 from app import schemas
-from app.chatgpt.chatgpt import chatgpt_router
 from app.databases import create_db_and_tables, User, async_session_maker
 from app.live.live import live_router
 from app.schemas import UserCreate, UserRead, UserUpdate
@@ -67,7 +65,6 @@ app.include_router(
 )
 app.include_router(live_router)
 app.include_router(transfer_router)
-app.include_router(chatgpt_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

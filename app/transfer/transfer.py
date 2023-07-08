@@ -59,18 +59,3 @@ async def get_entry_specific(keyword: str, session):
         .order_by(TransferMessage.received.desc()) \
         .limit(10)
     return await session.scalars(statement)
-
-
-@transfer_router.get("/entries/share")
-async def get_shared_messages(user: User = Depends(current_active_user)):
-    async with async_session_maker() as session:
-        statement = select(ShareRules).where(and_(ShareRules.user_id == user.id, ShareRules.share_type == 0))
-        items = []
-        if await session.scalar(statement) is not None:
-            for item in await get_entry_specific("百度账号", session):
-                items.append(item)
-    return {
-        'status': 'success',
-        'user': user,
-        'entries': items
-    }
